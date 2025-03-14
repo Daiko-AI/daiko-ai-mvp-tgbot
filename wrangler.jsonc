@@ -4,13 +4,19 @@
  */
 {
     "$schema": "node_modules/wrangler/config-schema.json",
-    "name": "sendai-cf-tgbot-sample",
+    "name": "daiko-ai-mvp",
     "main": "src/worker.ts",
     "compatibility_flags": ["nodejs_compat"],
     "compatibility_date": "2025-03-03",
     "observability": {
         "enabled": true
-    }
+    },
+    "kv_namespaces": [
+        {
+            "binding": "DAIKO_AI_DEV",
+            "id": "568855b564f44189a1dc60c7cc031d0a"
+        }
+    ]
     /**
      * Smart Placement
      * Docs: https://developers.cloudflare.com/workers/configuration/smart-placement/#smart-placement

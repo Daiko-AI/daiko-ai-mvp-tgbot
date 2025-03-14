@@ -19,6 +19,16 @@ export type StreamChunk = {
     };
 };
 
+// Setup step definition
+export enum SetupStep {
+    AGE = "age",
+    RISK_TOLERANCE = "risk_tolerance",
+    TOTAL_ASSETS = "total_assets",
+    CRYPTO_ASSETS = "crypto_assets",
+    PANIC_LEVEL = "panic_level",
+    COMPLETE = "complete",
+}
+
 /** Enum defining available log levels */
 export enum LogLevel {
     ERROR = 0,

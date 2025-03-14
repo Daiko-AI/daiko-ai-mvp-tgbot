@@ -73,6 +73,12 @@ For more details, check [here](https://help.zoho.com/portal/en/kb/desk/support-c
    { "ok": true, "result": true, "description": "Webhook was set" }
    ```
 
+## Setup KV store
+
+```bash
+npx wrangler kv namespace create DAIKO_AI_DEV
+```
+
 ## 🚀 Deploying to Cloudflare
 
 1. Log in to Cloudflare and access Workers & Pages

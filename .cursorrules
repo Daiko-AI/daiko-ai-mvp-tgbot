@@ -1,5 +1,7 @@
 # cursor.rules (TypeScript/Cloudflare Workers/LangGraph/LangChain specific)
 
+Use English for all prompts and product-related text.
+
 ## General Principles
 
 - Write concise, functional, modular code.

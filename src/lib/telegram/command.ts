@@ -1,7 +1,267 @@
-import type { Bot } from "grammy";
+import type { Bot, Context } from "grammy";
+import { InlineKeyboard } from "grammy";
+import { welcomeMessage } from "./messageTemplates";
+import { KVStore } from "../kv";
+import type { UserProfile } from "../../types/db";
+import { SetupStep } from "../../types";
 
-export const setupCommands = (bot: Bot) => {
+// Function to proceed to the next setup step
+export const proceedToNextStep = async (
+    ctx: Context,
+    env: Env,
+    userId: string,
+    currentStep: SetupStep | null,
+) => {
+    if (!env.DAIKO_AI_DEV) {
+        throw new Error("DAIKO_AI_DEV environment variable not found.");
+    }
+
+    const kvStore = new KVStore(env.DAIKO_AI_DEV);
+
+    let nextStep: SetupStep;
+
+    // Determine the next step based on the current step
+    if (!currentStep) {
+        nextStep = SetupStep.AGE;
+    } else {
+        switch (currentStep) {
+            case SetupStep.AGE:
+                nextStep = SetupStep.RISK_TOLERANCE;
+                break;
+            case SetupStep.RISK_TOLERANCE:
+                nextStep = SetupStep.TOTAL_ASSETS;
+                break;
+            case SetupStep.TOTAL_ASSETS:
+                nextStep = SetupStep.CRYPTO_ASSETS;
+                break;
+            case SetupStep.CRYPTO_ASSETS:
+                nextStep = SetupStep.COMPLETE;
+                break;
+            default:
+                nextStep = SetupStep.COMPLETE;
+        }
+    }
+
+    // Display prompts based on the next step
+    switch (nextStep) {
+        case SetupStep.AGE: {
+            await ctx.reply("First, please tell me your age (numbers only):", {
+                parse_mode: "Markdown",
+            });
+            await kvStore.updateUserProfile(userId, {
+                waitingForInput: SetupStep.AGE,
+                currentSetupStep: SetupStep.AGE,
+            });
+            break;
+        }
+
+        case SetupStep.RISK_TOLERANCE: {
+            const riskKeyboard = new InlineKeyboard()
+                .text("1️⃣", "risk_1")
+                .text("2️⃣", "risk_2")
+                .text("3️⃣", "risk_3")
+                .row()
+                .text("4️⃣", "risk_4")
+                .text("5️⃣", "risk_5")
+                .text("6️⃣", "risk_6")
+                .row()
+                .text("7️⃣", "risk_7")
+                .text("8️⃣", "risk_8")
+                .text("9️⃣", "risk_9")
+                .row()
+                .text("🔟", "risk_10");
+
+            await ctx.reply(
+                "Next, please select your risk tolerance for crypto assets on a scale of 1-10:\n\n" +
+                    "1️⃣ = Very conservative (risk-averse)\n" +
+                    "5️⃣ = Balanced\n" +
+                    "🔟 = Aggressive (high risk tolerance)",
+                {
+                    parse_mode: "Markdown",
+                    reply_markup: riskKeyboard,
+                },
+            );
+            await kvStore.updateUserProfile(userId, {
+                currentSetupStep: SetupStep.RISK_TOLERANCE,
+            });
+            break;
+        }
+
+        case SetupStep.TOTAL_ASSETS: {
+            await ctx.reply("Please tell me your total assets (numbers only, in USD):", {
+                parse_mode: "Markdown",
+            });
+            await kvStore.updateUserProfile(userId, {
+                waitingForInput: SetupStep.TOTAL_ASSETS,
+                currentSetupStep: SetupStep.TOTAL_ASSETS,
+            });
+            break;
+        }
+
+        case SetupStep.CRYPTO_ASSETS: {
+            await ctx.reply("Please tell me your crypto assets (numbers only, in USD):", {
+                parse_mode: "Markdown",
+            });
+            await kvStore.updateUserProfile(userId, {
+                waitingForInput: SetupStep.CRYPTO_ASSETS,
+                currentSetupStep: SetupStep.CRYPTO_ASSETS,
+            });
+            break;
+        }
+
+        case SetupStep.COMPLETE: {
+            const profile = await kvStore.getUserProfile(userId);
+
+            let profileSummary =
+                "*Profile Setup Complete*\n\nHere is your profile information:\n\n";
+
+            if (profile) {
+                if (profile.age) profileSummary += `🔢 Age: ${profile.age} years\n`;
+                if (profile.cryptoRiskTolerance)
+                    profileSummary += `📊 Risk Tolerance: ${profile.cryptoRiskTolerance}/10\n`;
+                if (profile.totalAssets)
+                    profileSummary += `💰 Total Assets: ${profile.totalAssets.toLocaleString()} USD\n`;
+                if (profile.cryptoAssets)
+                    profileSummary += `🪙 Crypto Assets: ${profile.cryptoAssets.toLocaleString()} USD\n`;
+            }
+
+            profileSummary +=
+                "\nSetup is complete! Daiko AI will provide you with optimal support. If you need any assistance, feel free to send a message!";
+
+            await ctx.reply(profileSummary, {
+                parse_mode: "Markdown",
+            });
+
+            // Mark setup as complete
+            await kvStore.updateUserProfile(userId, {
+                waitingForInput: null,
+                currentSetupStep: null,
+                setupCompleted: true,
+            });
+            break;
+        }
+    }
+};
+
+export const setupCommands = (bot: Bot, env: Env) => {
+    if (!env.DAIKO_AI_DEV) {
+        throw new Error("DAIKO_AI_DEV environment variable not found.");
+    }
+
+    const kvStore = new KVStore(env.DAIKO_AI_DEV);
+
     bot.command("start", async (ctx) => {
-        await ctx.reply("Hello, world!");
+        const keyboard = new InlineKeyboard().text("✅ Agree and start", "start_agree");
+
+        await ctx.reply(welcomeMessage, {
+            parse_mode: "Markdown",
+            reply_markup: keyboard,
+        });
     });
+
+    // Callback query handler for agreement button
+    bot.callbackQuery("start_agree", async (ctx) => {
+        await ctx.answerCallbackQuery({
+            text: "Thank you! Starting Daiko AI...",
+        });
+
+        if (!ctx.from) {
+            await ctx.reply("Could not retrieve user information. Please try again.", {
+                parse_mode: "Markdown",
+            });
+            return;
+        }
+
+        const userId = ctx.from.id.toString();
+
+        // Get existing profile or create a new one
+        let userProfile = await kvStore?.getUserProfile(userId);
+
+        if (!userProfile) {
+            // Create new user profile
+            const newProfile: UserProfile = {
+                userId,
+                username: ctx.from.username,
+                firstName: ctx.from.first_name,
+                lastName: ctx.from.last_name,
+                lastUpdated: Date.now(),
+            };
+
+            // Only attempt to save if KV is available
+            if (kvStore) {
+                await kvStore.setUserProfile(newProfile);
+                userProfile = newProfile;
+            }
+        }
+
+        // Send confirmation message
+        await ctx.reply("Thank you for agreeing to use Daiko AI! Let's set up your profile.", {
+            parse_mode: "Markdown",
+        });
+
+        // Proceed to the first setup step
+        await proceedToNextStep(ctx, env, userId, null);
+    });
+
+    // Register setup command handler
+    bot.command("setup", async (ctx) => {
+        if (!ctx.from) {
+            await ctx.reply("Could not retrieve user information. Please try again.", {
+                parse_mode: "Markdown",
+            });
+            return;
+        }
+
+        const userId = ctx.from.id.toString();
+
+        // Get existing profile or create a new one
+        let userProfile = await kvStore?.getUserProfile(userId);
+
+        if (!userProfile) {
+            // Create new user profile
+            const newProfile: UserProfile = {
+                userId,
+                username: ctx.from.username,
+                firstName: ctx.from.first_name,
+                lastName: ctx.from.last_name,
+                lastUpdated: Date.now(),
+            };
+
+            // Only attempt to save if KV is available
+            if (kvStore) {
+                await kvStore.setUserProfile(newProfile);
+                userProfile = newProfile;
+            }
+        }
+
+        await ctx.reply("Starting profile setup.", {
+            parse_mode: "Markdown",
+        });
+
+        // Proceed to the first setup step
+        await proceedToNextStep(ctx, env, userId, null);
+    });
+
+    // Risk tolerance selection handler (1-10)
+    for (let i = 1; i <= 10; i++) {
+        bot.callbackQuery(`risk_${i}`, async (ctx) => {
+            if (!ctx.from || !kvStore) return;
+
+            const userId = ctx.from.id.toString();
+            const profile = await kvStore.getUserProfile(userId);
+
+            if (!profile || profile.currentSetupStep !== SetupStep.RISK_TOLERANCE) return;
+
+            await ctx.answerCallbackQuery({
+                text: `Risk tolerance set to ${i}!`,
+            });
+
+            await kvStore.updateUserProfile(userId, {
+                cryptoRiskTolerance: i,
+            });
+
+            // Proceed to the next step
+            await proceedToNextStep(ctx, env, userId, SetupStep.RISK_TOLERANCE);
+        });
+    }
 };

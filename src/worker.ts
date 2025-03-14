@@ -16,12 +16,12 @@ import { TIMEOUT_MS } from "./constants";
  */
 
 export default {
-    async fetch(request: Request, env: Env): Promise<Response> {
+    async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
         // inject environment variables
         injectEnv(env);
 
         const { setupTelegramBot } = await import("./lib/telegram/bot");
-        const bot = setupTelegramBot();
+        const bot = setupTelegramBot(env);
 
         const handler = webhookCallback(bot, "cloudflare-mod", {
             timeoutMilliseconds: TIMEOUT_MS,
@@ -33,4 +33,4 @@ export default {
 
         return handler(request);
     },
-};
+} satisfies ExportedHandler<Env, { USERS: KVNamespace }>;

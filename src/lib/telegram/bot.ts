@@ -6,9 +6,9 @@ import { setupCommands } from "./command";
  * Initialize and configure the Telegram bot
  * @returns webhookCallback handler
  */
-export const setupTelegramBot = () => {
+export const setupTelegramBot = (env: Env) => {
     // get Telegram bot token
-    const token = process.env.TELEGRAM_BOT_TOKEN;
+    const token = env.TELEGRAM_BOT_TOKEN;
     if (!token) {
         throw new Error("TELEGRAM_BOT_TOKEN environment variable not found.");
     }
@@ -17,10 +17,10 @@ export const setupTelegramBot = () => {
     const bot = new Bot(token);
 
     // commands
-    setupCommands(bot);
+    setupCommands(bot, env);
 
     // text message handler
-    setupHandler(bot);
+    setupHandler(bot, env);
 
     return bot;
 };
