@@ -1,0 +1,21 @@
+{
+    "deno.enable": false,
+    "biome.enabled": true,
+    "editor.formatOnSave": true,
+    "files.associations": {
+        ".cursorrules": "markdown"
+    },
+    "[typescript]": {
+        "editor.defaultFormatter": "biomejs.biome"
+    },
+    "[javascript]": {
+        "editor.defaultFormatter": "biomejs.biome"
+    },
+    "[json]": {
+        "editor.defaultFormatter": "biomejs.biome"
+    },
+    "[jsonc]": {
+        "editor.defaultFormatter": "biomejs.biome"
+    },
+    "cSpell.words": ["langchain", "langgraph", "Solana"]
+}
