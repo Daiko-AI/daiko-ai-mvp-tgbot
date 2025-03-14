@@ -3,7 +3,7 @@ import { gpt4oMini } from "../utils/model";
 import { memory, type solanaAgentState } from "../utils/state";
 import { TavilySearchResults } from "@langchain/community/tools/tavily_search";
 import type { Tool } from "@langchain/core/tools";
-import { mainPrompt } from "../prompts/main";
+import { generalPrompt } from "../prompts/general";
 
 // Initialize tools array
 const tools: Tool[] = [];
@@ -17,7 +17,7 @@ const generalAgent = createReactAgent({
     llm: gpt4oMini,
     tools,
     checkpointSaver: memory,
-    prompt: mainPrompt,
+    prompt: generalPrompt,
 });
 
 export const generalistNode = async (state: typeof solanaAgentState.State) => {

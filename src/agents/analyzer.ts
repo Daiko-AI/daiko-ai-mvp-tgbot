@@ -34,6 +34,7 @@ export const analyzerNode = async (state: typeof solanaAgentState.State) => {
     const { messages } = state;
 
     const result = await analyzerAgent.invoke({ messages });
+    console.log("analyzer result", result);
 
     return { messages: [...result.messages] };
 };
