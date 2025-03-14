@@ -1,7 +1,7 @@
 import { createSolanaTools } from "solana-agent-kit";
-import { solanaAgentKit } from "../utils/solana";
+import { solanaAgent } from "../utils/solanaAgent";
 
 export const solanaTools = () => {
-    const tools = createSolanaTools(solanaAgentKit);
+    const tools = createSolanaTools(solanaAgent);
     return tools;
 };
