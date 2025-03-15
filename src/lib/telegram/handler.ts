@@ -1,12 +1,15 @@
 import type { Bot, Context } from "grammy";
-import { initGraph } from "../../agents/main";
-import { HumanMessage } from "@langchain/core/messages";
+import { initGraph } from "../../agents";
+import { HumanMessage, AIMessage } from "@langchain/core/messages";
 import { TIMEOUT_MS } from "../../constants";
 import { LogLevel, type StreamChunk } from "../../types";
 import { Logger } from "../../utils/logger";
 import { KVStore } from "../kv";
 import { SetupStep } from "../../types";
 import { proceedToNextStep } from "./command";
+
+// NOTE: Map for storing chat history which is global memory on cloudflare
+const chatHistory = new Map();
 
 export const setupHandler = (bot: Bot, env: Env) => {
     // Get KVStore instance
@@ -126,6 +129,15 @@ export const setupHandler = (bot: Bot, env: Env) => {
             const { agent, config } = await initGraph(userId);
             logger.info("message handler", "Initialized Graph");
 
+            if (!chatHistory.has(userId)) {
+                chatHistory.set(userId, []);
+            }
+            const userChatHistory = chatHistory.get(userId);
+            userChatHistory.push(new HumanMessage(ctx.message.text));
+
+            // analyzerまたはgeneralistのメッセージを格納する変数
+            let latestAgentMessage: string | null = null;
+
             // send user message to agent
             const stream = await agent.stream(
                 {
@@ -148,24 +160,65 @@ export const setupHandler = (bot: Bot, env: Env) => {
                 ])) as AsyncIterable<StreamChunk>) {
                     // logger.info("message handler", "Received chunk", chunk);
 
+                    // チャンクからanalyzerまたはgeneralistのメッセージを取得
+                    if ("analyzer" in chunk && chunk.analyzer?.messages?.length > 0) {
+                        const lastIndex = chunk.analyzer.messages.length - 1;
+                        if (chunk.analyzer.messages[lastIndex]?.content) {
+                            latestAgentMessage = String(chunk.analyzer.messages[lastIndex].content);
+                            logger.info(
+                                "message handler",
+                                "Got analyzer message",
+                                latestAgentMessage,
+                            );
+                        }
+                    } else if ("generalist" in chunk && chunk.generalist?.messages?.length > 0) {
+                        const lastIndex = chunk.generalist.messages.length - 1;
+                        if (chunk.generalist.messages[lastIndex]?.content) {
+                            latestAgentMessage = String(
+                                chunk.generalist.messages[lastIndex].content,
+                            );
+                            logger.info(
+                                "message handler",
+                                "Got generalist message",
+                                latestAgentMessage,
+                            );
+                        }
+                    }
+
                     // Dump token usage
-                    if (chunk.agent?.messages[chunk.agent.messages.length - 1]?.usage_metadata) {
+                    if (
+                        "analyzer" in chunk &&
+                        chunk.analyzer?.messages?.length > 0 &&
+                        chunk.analyzer.messages[chunk.analyzer.messages.length - 1]?.usage_metadata
+                    ) {
                         logger.info(
                             "message handler",
-                            "Usage metadata",
-                            chunk.agent.messages[chunk.agent.messages.length - 1].usage_metadata,
+                            "Usage metadata (analyzer)",
+                            chunk.analyzer.messages[chunk.analyzer.messages.length - 1]
+                                .usage_metadata,
+                        );
+                    } else if (
+                        "generalist" in chunk &&
+                        chunk.generalist?.messages?.length > 0 &&
+                        chunk.generalist.messages[chunk.generalist.messages.length - 1]
+                            ?.usage_metadata
+                    ) {
+                        logger.info(
+                            "message handler",
+                            "Usage metadata (generalist)",
+                            chunk.generalist.messages[chunk.generalist.messages.length - 1]
+                                .usage_metadata,
                         );
                     }
 
-                    if ("agent" in chunk) {
-                        const lastIndex = chunk.agent.messages.length - 1;
-                        if (chunk.agent.messages[lastIndex].content) {
-                            if (!ctx.chat?.id) return;
-                            await ctx.api.deleteMessage(ctx.chat.id, thinkingMessage.message_id);
-                            await ctx.reply(String(chunk.agent.messages[lastIndex].content), {
-                                parse_mode: "Markdown",
-                            });
-                        }
+                    // latestAgentMessageが取得できた場合の処理
+                    if (latestAgentMessage) {
+                        if (!ctx.chat?.id) return;
+                        await ctx.api.deleteMessage(ctx.chat.id, thinkingMessage.message_id);
+                        await ctx.reply(latestAgentMessage, {
+                            parse_mode: "Markdown",
+                        });
+                        userChatHistory.push(new AIMessage(latestAgentMessage));
                     }
                 }
             } catch (error: unknown) {

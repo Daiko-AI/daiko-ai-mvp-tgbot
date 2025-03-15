@@ -5,6 +5,147 @@ import { KVStore } from "../kv";
 import type { UserProfile } from "../../types/db";
 import { SetupStep } from "../../types";
 
+export const setupCommands = (bot: Bot, env: Env) => {
+    if (!env.DAIKO_AI_DEV) {
+        throw new Error("DAIKO_AI_DEV environment variable not found.");
+    }
+
+    const kvStore = new KVStore(env.DAIKO_AI_DEV);
+
+    bot.command("start", async (ctx) => {
+        const keyboard = new InlineKeyboard().text("✅ Agree and start", "start_agree");
+
+        await ctx.reply(welcomeMessage, {
+            parse_mode: "Markdown",
+            reply_markup: keyboard,
+        });
+    });
+
+    // Callback query handler for agreement button
+    bot.callbackQuery("start_agree", async (ctx) => {
+        await ctx.answerCallbackQuery({
+            text: "Thank you! Starting Daiko AI...",
+        });
+
+        if (!ctx.from) {
+            await ctx.reply("Could not retrieve user information. Please try again.", {
+                parse_mode: "Markdown",
+            });
+            return;
+        }
+
+        const userId = ctx.from.id.toString();
+
+        // Get existing profile or create a new one
+        let userProfile = await kvStore?.getUserProfile(userId);
+
+        if (!userProfile) {
+            // Create new user profile
+            const newProfile: UserProfile = {
+                userId,
+                username: ctx.from.username,
+                firstName: ctx.from.first_name,
+                lastName: ctx.from.last_name,
+                lastUpdated: Date.now(),
+            };
+
+            // Only attempt to save if KV is available
+            if (kvStore) {
+                await kvStore.setUserProfile(newProfile);
+                userProfile = newProfile;
+            }
+        }
+
+        // Send confirmation message
+        await ctx.reply("Thank you for agreeing to use Daiko AI! Let's set up your profile.", {
+            parse_mode: "Markdown",
+        });
+
+        // Proceed to the first setup step
+        await proceedToNextStep(ctx, env, userId, null);
+    });
+
+    // Register setup command handler
+    bot.command("setup", async (ctx) => {
+        if (!ctx.from) {
+            await ctx.reply("Could not retrieve user information. Please try again.", {
+                parse_mode: "Markdown",
+            });
+            return;
+        }
+
+        const userId = ctx.from.id.toString();
+
+        // Get existing profile or create a new one
+        let userProfile = await kvStore?.getUserProfile(userId);
+
+        if (!userProfile) {
+            // Create new user profile
+            const newProfile: UserProfile = {
+                userId,
+                username: ctx.from.username,
+                firstName: ctx.from.first_name,
+                lastName: ctx.from.last_name,
+                lastUpdated: Date.now(),
+            };
+
+            // Only attempt to save if KV is available
+            if (kvStore) {
+                await kvStore.setUserProfile(newProfile);
+                userProfile = newProfile;
+            }
+        }
+
+        await ctx.reply("Starting profile setup.", {
+            parse_mode: "Markdown",
+        });
+
+        // Proceed to the first setup step
+        await proceedToNextStep(ctx, env, userId, null);
+    });
+
+    // Risk tolerance selection handler (1-10)
+    for (let i = 1; i <= 10; i++) {
+        bot.callbackQuery(`risk_${i}`, async (ctx) => {
+            if (!ctx.from || !kvStore) return;
+
+            const userId = ctx.from.id.toString();
+            const profile = await kvStore.getUserProfile(userId);
+
+            if (!profile || profile.currentSetupStep !== SetupStep.RISK_TOLERANCE) return;
+
+            await ctx.answerCallbackQuery({
+                text: `Risk tolerance set to ${i}!`,
+            });
+
+            await kvStore.updateUserProfile(userId, {
+                cryptoRiskTolerance: i,
+            });
+
+            // Proceed to the next step
+            await proceedToNextStep(ctx, env, userId, SetupStep.RISK_TOLERANCE);
+        });
+    }
+
+    bot.command("help", async (ctx) => {
+        await ctx.reply(
+            "Please use /setup to start the setup process. If you need help, please contact @daiko_ai.",
+            {
+                parse_mode: "Markdown",
+            },
+        );
+    });
+
+    bot.command("feedback", async (ctx) => {
+        await ctx.reply(
+            "please fill out the feedback form at https://forms.gle/daiko-ai-feedback",
+            {
+                parse_mode: "Markdown",
+            },
+        );
+    });
+};
+
 // Function to proceed to the next setup step
 export const proceedToNextStep = async (
     ctx: Context,
@@ -140,128 +281,5 @@ export const proceedToNextStep = async (
             });
             break;
         }
-    }
-};
-
-export const setupCommands = (bot: Bot, env: Env) => {
-    if (!env.DAIKO_AI_DEV) {
-        throw new Error("DAIKO_AI_DEV environment variable not found.");
-    }
-
-    const kvStore = new KVStore(env.DAIKO_AI_DEV);
-
-    bot.command("start", async (ctx) => {
-        const keyboard = new InlineKeyboard().text("✅ Agree and start", "start_agree");
-
-        await ctx.reply(welcomeMessage, {
-            parse_mode: "Markdown",
-            reply_markup: keyboard,
-        });
-    });
-
-    // Callback query handler for agreement button
-    bot.callbackQuery("start_agree", async (ctx) => {
-        await ctx.answerCallbackQuery({
-            text: "Thank you! Starting Daiko AI...",
-        });
-
-        if (!ctx.from) {
-            await ctx.reply("Could not retrieve user information. Please try again.", {
-                parse_mode: "Markdown",
-            });
-            return;
-        }
-
-        const userId = ctx.from.id.toString();
-
-        // Get existing profile or create a new one
-        let userProfile = await kvStore?.getUserProfile(userId);
-
-        if (!userProfile) {
-            // Create new user profile
-            const newProfile: UserProfile = {
-                userId,
-                username: ctx.from.username,
-                firstName: ctx.from.first_name,
-                lastName: ctx.from.last_name,
-                lastUpdated: Date.now(),
-            };
-
-            // Only attempt to save if KV is available
-            if (kvStore) {
-                await kvStore.setUserProfile(newProfile);
-                userProfile = newProfile;
-            }
-        }
-
-        // Send confirmation message
-        await ctx.reply("Thank you for agreeing to use Daiko AI! Let's set up your profile.", {
-            parse_mode: "Markdown",
-        });
-
-        // Proceed to the first setup step
-        await proceedToNextStep(ctx, env, userId, null);
-    });
-
-    // Register setup command handler
-    bot.command("setup", async (ctx) => {
-        if (!ctx.from) {
-            await ctx.reply("Could not retrieve user information. Please try again.", {
-                parse_mode: "Markdown",
-            });
-            return;
-        }
-
-        const userId = ctx.from.id.toString();
-
-        // Get existing profile or create a new one
-        let userProfile = await kvStore?.getUserProfile(userId);
-
-        if (!userProfile) {
-            // Create new user profile
-            const newProfile: UserProfile = {
-                userId,
-                username: ctx.from.username,
-                firstName: ctx.from.first_name,
-                lastName: ctx.from.last_name,
-                lastUpdated: Date.now(),
-            };
-
-            // Only attempt to save if KV is available
-            if (kvStore) {
-                await kvStore.setUserProfile(newProfile);
-                userProfile = newProfile;
-            }
-        }
-
-        await ctx.reply("Starting profile setup.", {
-            parse_mode: "Markdown",
-        });
-
-        // Proceed to the first setup step
-        await proceedToNextStep(ctx, env, userId, null);
-    });
-
-    // Risk tolerance selection handler (1-10)
-    for (let i = 1; i <= 10; i++) {
-        bot.callbackQuery(`risk_${i}`, async (ctx) => {
-            if (!ctx.from || !kvStore) return;
-
-            const userId = ctx.from.id.toString();
-            const profile = await kvStore.getUserProfile(userId);
-
-            if (!profile || profile.currentSetupStep !== SetupStep.RISK_TOLERANCE) return;
-
-            await ctx.answerCallbackQuery({
-                text: `Risk tolerance set to ${i}!`,
-            });
-
-            await kvStore.updateUserProfile(userId, {
-                cryptoRiskTolerance: i,
-            });
-
-            // Proceed to the next step
-            await proceedToNextStep(ctx, env, userId, SetupStep.RISK_TOLERANCE);
-        });
     }
 };

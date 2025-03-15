@@ -14,7 +14,6 @@ import { TIMEOUT_MS } from "./constants";
  *
  * Learn more at https://developers.cloudflare.com/workers/
  */
-
 export default {
     async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
         // inject environment variables
@@ -33,4 +32,4 @@ export default {
 
         return handler(request);
     },
-} satisfies ExportedHandler<Env, { USERS: KVNamespace }>;
+} satisfies ExportedHandler<Env, { DAIKO_AI_DEV: KVNamespace }>;
