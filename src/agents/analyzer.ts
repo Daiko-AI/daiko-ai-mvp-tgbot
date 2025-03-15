@@ -7,7 +7,7 @@ import {
     SolanaFetchTokenReportSummaryTool,
     SolanaFetchPriceTool,
     SolanaTokenDataByTickerTool,
-    SolanaOrcaFetchPositions,
+    // SolanaOrcaFetchPositions,
 } from "solana-agent-kit/dist/langchain";
 import { SolanaGetAllAssetsByOwner } from "../tools/getAllAssetsByOwner";
 import { solanaAgent } from "../utils/solanaAgent";
@@ -20,10 +20,10 @@ const tools: Tool[] = [
     new SolanaFetchTokenReportSummaryTool(solanaAgent),
     new SolanaFetchPriceTool(solanaAgent),
     new SolanaTokenDataByTickerTool(solanaAgent),
-    new SolanaOrcaFetchPositions(solanaAgent),
+    // new SolanaOrcaFetchPositions(solanaAgent),
 ];
 
-const analyzerAgent = createReactAgent({
+export const analyzerAgent = createReactAgent({
     llm: gpt4oMini,
     tools,
     checkpointSaver: memory,
