@@ -142,6 +142,7 @@ export const setupHandler = (bot: Bot, env: Env) => {
             const stream = await agent.stream(
                 {
                     messages: [new HumanMessage(ctx.message.text)],
+                    userProfile: profile,
                 },
                 config,
             );

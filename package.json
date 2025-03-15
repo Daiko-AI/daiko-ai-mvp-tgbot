@@ -20,6 +20,7 @@
         "dotenv": "^16.4.7",
         "grammy": "^1.35.0",
         "solana-agent-kit": "^1.4.9",
+        "twitter-api-sdk": "^1.2.1",
         "zod": "^3.24.2"
     },
     "devDependencies": {

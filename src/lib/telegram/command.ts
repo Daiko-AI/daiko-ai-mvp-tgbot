@@ -43,9 +43,7 @@ export const setupCommands = (bot: Bot, env: Env) => {
             // Create new user profile
             const newProfile: UserProfile = {
                 userId,
-                username: ctx.from.username,
-                firstName: ctx.from.first_name,
-                lastName: ctx.from.last_name,
+                walletAddress: "",
                 lastUpdated: Date.now(),
             };
 
@@ -83,9 +81,7 @@ export const setupCommands = (bot: Bot, env: Env) => {
             // Create new user profile
             const newProfile: UserProfile = {
                 userId,
-                username: ctx.from.username,
-                firstName: ctx.from.first_name,
-                lastName: ctx.from.last_name,
+                walletAddress: "",
                 lastUpdated: Date.now(),
             };
 
@@ -163,9 +159,12 @@ export const proceedToNextStep = async (
 
     // Determine the next step based on the current step
     if (!currentStep) {
-        nextStep = SetupStep.AGE;
+        nextStep = SetupStep.WALLET_ADDRESS;
     } else {
         switch (currentStep) {
+            case SetupStep.WALLET_ADDRESS:
+                nextStep = SetupStep.AGE;
+                break;
             case SetupStep.AGE:
                 nextStep = SetupStep.RISK_TOLERANCE;
                 break;
@@ -185,6 +184,17 @@ export const proceedToNextStep = async (
 
     // Display prompts based on the next step
     switch (nextStep) {
+        case SetupStep.WALLET_ADDRESS: {
+            await ctx.reply("First, please tell me your wallet address:", {
+                parse_mode: "Markdown",
+            });
+            await kvStore.updateUserProfile(userId, {
+                waitingForInput: SetupStep.WALLET_ADDRESS,
+                currentSetupStep: SetupStep.WALLET_ADDRESS,
+            });
+            break;
+        }
+
         case SetupStep.AGE: {
             await ctx.reply("First, please tell me your age (numbers only):", {
                 parse_mode: "Markdown",
@@ -228,24 +238,30 @@ export const proceedToNextStep = async (
             break;
         }
 
-        case SetupStep.TOTAL_ASSETS: {
-            await ctx.reply("Please tell me your total assets (numbers only, in USD):", {
-                parse_mode: "Markdown",
-            });
+        case SetupStep.CRYPTO_ASSETS: {
+            await ctx.reply(
+                "Enter an approximate total value of all your crypto across all wallets (numbers only, in USD):",
+                {
+                    parse_mode: "Markdown",
+                },
+            );
             await kvStore.updateUserProfile(userId, {
-                waitingForInput: SetupStep.TOTAL_ASSETS,
-                currentSetupStep: SetupStep.TOTAL_ASSETS,
+                waitingForInput: SetupStep.CRYPTO_ASSETS,
+                currentSetupStep: SetupStep.CRYPTO_ASSETS,
             });
             break;
         }
 
-        case SetupStep.CRYPTO_ASSETS: {
-            await ctx.reply("Please tell me your crypto assets (numbers only, in USD):", {
-                parse_mode: "Markdown",
-            });
+        case SetupStep.TOTAL_ASSETS: {
+            await ctx.reply(
+                "Enter an approximate total value of all your assets, including stocks, real estate, etc (numbers only, in USD):",
+                {
+                    parse_mode: "Markdown",
+                },
+            );
             await kvStore.updateUserProfile(userId, {
-                waitingForInput: SetupStep.CRYPTO_ASSETS,
-                currentSetupStep: SetupStep.CRYPTO_ASSETS,
+                waitingForInput: SetupStep.TOTAL_ASSETS,
+                currentSetupStep: SetupStep.TOTAL_ASSETS,
             });
             break;
         }

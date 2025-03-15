@@ -13,10 +13,10 @@ export const managerNode = async (state: typeof solanaAgentState.State) => {
         messages: messages,
     });
 
-    const { isAnalyzerQuery, isGeneralQuery } = result;
+    const { isDataFetchOperatorNodeQuery, isGeneralQuery } = result;
 
     return {
-        isAnalyzerQuery,
+        isDataFetchOperatorNodeQuery,
         isGeneralQuery,
     };
 };

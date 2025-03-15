@@ -29,6 +29,7 @@ export type StreamChunk = {
 
 // Setup step definition
 export enum SetupStep {
+    WALLET_ADDRESS = "wallet_address",
     AGE = "age",
     RISK_TOLERANCE = "risk_tolerance",
     TOTAL_ASSETS = "total_assets",
