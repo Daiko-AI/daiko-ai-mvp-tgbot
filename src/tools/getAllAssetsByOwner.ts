@@ -58,10 +58,40 @@ export class SolanaGetAllAssetsByOwner extends Tool {
             const data = (await response.json()) as { result: { items: any[] } };
             const assets = data?.result?.items;
 
+            // Format assets with proper decimals and required information
+            const formattedAssets = assets.map((asset) => {
+                const tokenInfo = asset.token_info;
+                const metadata = asset.content?.metadata;
+
+                // Calculate actual balance considering decimals
+                const rawBalance = tokenInfo.balance;
+                const decimals = tokenInfo.decimals;
+                const actualBalance = rawBalance / 10 ** decimals;
+
+                // Calculate total value in USDC
+                const pricePerToken = tokenInfo.price_info?.price_per_token || 0;
+                const totalValue = tokenInfo.price_info?.total_price || 0;
+
+                return {
+                    name: metadata?.name || tokenInfo.symbol,
+                    symbol: tokenInfo.symbol,
+                    amount: actualBalance,
+                    decimals: decimals,
+                    price_per_token: pricePerToken,
+                    total_value_usdc: totalValue,
+                    mint: asset.id,
+                    // Additional useful information for the agent
+                    token_account: tokenInfo.associated_token_address,
+                };
+            });
+
+            // Sort by total value (descending)
+            formattedAssets.sort((a, b) => b.total_value_usdc - a.total_value_usdc);
+
             return JSON.stringify({
                 status: "success",
                 message: "Assets retrieved successfully",
-                assets: assets,
+                assets: formattedAssets,
             });
 
             // biome-ignore lint/suspicious/noExplicitAny: use any
