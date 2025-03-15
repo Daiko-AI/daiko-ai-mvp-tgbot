@@ -1,6 +1,6 @@
 import type { Bot, Context } from "grammy";
 import { initGraph } from "../../agents";
-import { HumanMessage } from "@langchain/core/messages";
+import { HumanMessage, AIMessage } from "@langchain/core/messages";
 import { TIMEOUT_MS } from "../../constants";
 import { LogLevel, type StreamChunk } from "../../types";
 import { Logger } from "../../utils/logger";
@@ -9,7 +9,7 @@ import { SetupStep } from "../../types";
 import { proceedToNextStep } from "./command";
 
 // NOTE: Map for storing chat history which is global memory on cloudflare
-// const chatHistory = new Map();
+const chatHistory = new Map();
 
 export const setupHandler = (bot: Bot, env: Env) => {
     // Get KVStore instance
@@ -129,11 +129,11 @@ export const setupHandler = (bot: Bot, env: Env) => {
             const { agent, config } = await initGraph(userId);
             logger.info("message handler", "Initialized Graph");
 
-            // if (!chatHistory.has(userId)) {
-            //     chatHistory.set(userId, []);
-            // }
-            // const userChatHistory = chatHistory.get(userId);
-            // userChatHistory.push(new HumanMessage(ctx.message.text));
+            if (!chatHistory.has(userId)) {
+                chatHistory.set(userId, []);
+            }
+            const userChatHistory = chatHistory.get(userId);
+            userChatHistory.push(new HumanMessage(ctx.message.text));
 
             // analyzerまたはgeneralistのメッセージを格納する変数
             let latestAgentMessage: string | null = null;
@@ -218,7 +218,7 @@ export const setupHandler = (bot: Bot, env: Env) => {
                         await ctx.reply(latestAgentMessage, {
                             parse_mode: "Markdown",
                         });
-                        // userChatHistory.push(new AIMessage(latestAgentMessage));
+                        userChatHistory.push(new AIMessage(latestAgentMessage));
                     }
                 }
             } catch (error: unknown) {
