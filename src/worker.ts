@@ -22,10 +22,12 @@ export default {
         const { setupTelegramBot } = await import("./lib/telegram/bot");
         const bot = setupTelegramBot(env);
 
+        const start = Date.now();
         const handler = webhookCallback(bot, "cloudflare-mod", {
             timeoutMilliseconds: TIMEOUT_MS,
             onTimeout: () => {
-                console.error("Timeout");
+                const end = Date.now();
+                console.error(`Timeout: ${end - start}ms`);
                 return new Response("Timeout", { status: 408 });
             },
         });

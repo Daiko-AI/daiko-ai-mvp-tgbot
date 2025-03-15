@@ -2,9 +2,7 @@
 export interface UserProfile {
     // Basic info
     userId: string;
-    username?: string;
-    firstName?: string;
-    lastName?: string;
+    walletAddress: string;
 
     // Economic situation
     age?: number;

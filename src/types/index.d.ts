@@ -15,4 +15,5 @@ interface Env {
     HELIUS_API_KEY?: string;
     ETHEREUM_PRIVATE_KEY?: string;
     ELFA_AI_API_KEY?: string;
+    TWITTER_API_BEARER_TOKEN?: string;
 }

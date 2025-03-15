@@ -9,13 +9,13 @@ import {
     // SolanaTokenDataByTickerTool,
     // SolanaOrcaFetchPositions,
 } from "solana-agent-kit/dist/langchain";
-// import { SolanaGetAllAssetsByOwner } from "../tools/getAllAssetsByOwner";
-// import { solanaAgent } from "../utils/solanaAgent";
-import { analyzerPrompt } from "../prompts/analyzer";
+import { SolanaGetAllAssetsByOwner } from "../tools/getAllAssetsByOwner";
+import { solanaAgent } from "../utils/solanaAgent";
+import { onchainPrompt } from "../prompts/onchain";
 
 // Initialize tools array
 const tools: Tool[] = [
-    // new SolanaGetAllAssetsByOwner(solanaAgent),
+    new SolanaGetAllAssetsByOwner(solanaAgent),
     // new SolanaAlloraGetPriceInference(solanaAgent),
     // new SolanaFetchTokenReportSummaryTool(solanaAgent),
     // new SolanaFetchPriceTool(solanaAgent),
@@ -23,19 +23,19 @@ const tools: Tool[] = [
     // new SolanaOrcaFetchPositions(solanaAgent),
 ];
 
-export const analyzerAgent = createReactAgent({
+export const onchainAgent = createReactAgent({
     llm: gpt4oMini,
     tools,
     checkpointSaver: memory,
-    prompt: analyzerPrompt,
+    prompt: onchainPrompt,
 });
 
-export const analyzerNode = async (state: typeof solanaAgentState.State) => {
-    console.log("analyzerNode", state);
-    const { messages, userProfile } = state;
+export const onchainNode = async (state: typeof solanaAgentState.State) => {
+    const { messages } = state;
+    console.log("onchainNode:", messages);
 
-    const result = await analyzerAgent.invoke({ messages });
-    console.log("analyzer result", result);
+    const result = await onchainAgent.invoke({ messages });
+    console.log("onchain result", result);
 
     return { messages: [...result.messages] };
 };
