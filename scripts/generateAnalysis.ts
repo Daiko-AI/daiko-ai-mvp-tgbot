@@ -6,12 +6,13 @@ import { HumanMessage } from "@langchain/core/messages";
 config({ path: resolve(__dirname, "../.dev.vars") });
 
 const main = async () => {
-    const { analyzerAgent } = await import("../src/agents/analyzer");
+    const { initGraph } = await import("../src/agents");
 
     // Generate a unique thread ID
-    const threadId = "analysis-manual";
+    const userId = "analysis-manual";
+    const { agent, config } = await initGraph(userId);
 
-    const result = await analyzerAgent.invoke(
+    const result = await agent.invoke(
         {
             messages: [
                 new HumanMessage(
@@ -19,11 +20,7 @@ const main = async () => {
                 ),
             ],
         },
-        {
-            configurable: {
-                thread_id: threadId,
-            },
-        },
+        config,
     );
 
     console.log(result);
