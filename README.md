@@ -4,7 +4,7 @@ This project demonstrates how to build a Telegram bot using [Solana Agent Kit](h
 
 ## Graph Architecture
 
-![Graph Architecture](./docs/graph.md)
+![Graph Architecture](./docs/graph.png)
 
 ## 📌 Requirements
 
