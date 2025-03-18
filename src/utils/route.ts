@@ -1,7 +1,9 @@
 import type { solanaAgentState } from "./state";
 import { END } from "@langchain/langgraph";
 
-export const managerRouter = (state: typeof solanaAgentState.State) => {
+export const managerRouter = (
+    state: typeof solanaAgentState.State,
+): "dataFetchOperator" | "generalist" | typeof END => {
     const { isDataFetchOperatorNodeQuery, isGeneralQuery } = state;
 
     if (isDataFetchOperatorNodeQuery) {

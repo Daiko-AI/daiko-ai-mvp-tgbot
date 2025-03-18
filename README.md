@@ -1,12 +1,10 @@
-# sendai-cf-tgbot-sample
+# daiko-ai-mvp
 
 This project demonstrates how to build a Telegram bot using [Solana Agent Kit](https://github.com/sendaifun/solana-agent-kit) and Cloudflare Workers.
 
-## 📦 Features
+## Graph Architecture
 
-- Serverless deployment using Cloudflare Workers
-- Blockchain integration with Solana Agent Kit
-- Interactive user experience through Telegram bot interface
+![Graph Architecture](./docs/graph.md)
 
 ## 📌 Requirements
 
