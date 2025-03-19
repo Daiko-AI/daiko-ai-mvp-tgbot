@@ -1,4 +1,4 @@
-# daiko-ai-mvp
+# daiko-ai-mvp-tgbot
 
 This project demonstrates how to build a Telegram bot using [Solana Agent Kit](https://github.com/sendaifun/solana-agent-kit) and Cloudflare Workers.
 
