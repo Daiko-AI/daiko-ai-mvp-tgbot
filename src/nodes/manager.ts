@@ -13,10 +13,10 @@ export const managerNode = async (state: typeof graphState.State) => {
         messages: messages,
     });
 
-    const { isDataFetchOperatorNodeQuery, isGeneralQuery } = result;
+    const { isDataFetchNodeQuery, isGeneralQuery } = result;
 
     return {
-        isDataFetchOperatorNodeQuery,
+        isDataFetchNodeQuery,
         isGeneralQuery,
     };
 };

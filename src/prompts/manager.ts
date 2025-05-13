@@ -4,7 +4,7 @@ import { PromptTemplate } from "@langchain/core/prompts";
 
 export const parser = StructuredOutputParser.fromZodSchema(
     z.object({
-        isDataFetchOperatorNodeQuery: z
+        isDataFetchNodeQuery: z
             .boolean()
             .describe("Query requires analyzing portfolio and token holdings"),
         isGeneralQuery: z.boolean().describe("Query is about non-blockchain topics"),
@@ -21,7 +21,7 @@ export const prompt = PromptTemplate.fromTemplate(
     {formatInstructions}
 
     Classification Guidelines:
-    - Data Fetch Operator Node Queries (Set isDataFetchOperatorNodeQuery=true):
+    - Data Fetch Node Queries (Set isDataFetchNodeQuery=true):
       * Portfolio analysis and valuations
       * Token price checks and market data
       * Account balance inquiries
