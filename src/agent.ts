@@ -11,11 +11,12 @@ export async function initGraph(userId: string) {
         const config = { configurable: { thread_id: userId } };
 
         const workflow = new StateGraph(graphState)
+            // nodes
             .addNode("generalist", generalistNode)
             .addNode("analyzer", analyzerNode)
-
             .addNode("manager", managerNode)
             .addNode("dataFetch", dataFetchNode)
+            // edges
             .addEdge(START, "manager")
             .addConditionalEdges("manager", managerRouter)
             .addEdge("dataFetch", "analyzer")
