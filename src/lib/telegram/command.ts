@@ -164,20 +164,21 @@ export const proceedToNextStep = async (
     } else {
         switch (currentStep) {
             case SetupStep.WALLET_ADDRESS:
-                nextStep = SetupStep.AGE;
-                break;
-            case SetupStep.AGE:
-                nextStep = SetupStep.RISK_TOLERANCE;
-                break;
-            case SetupStep.RISK_TOLERANCE:
-                nextStep = SetupStep.TOTAL_ASSETS;
-                break;
-            case SetupStep.TOTAL_ASSETS:
-                nextStep = SetupStep.CRYPTO_ASSETS;
-                break;
-            case SetupStep.CRYPTO_ASSETS:
+                // nextStep = SetupStep.AGE;
                 nextStep = SetupStep.COMPLETE;
                 break;
+            // case SetupStep.AGE:
+            //     nextStep = SetupStep.RISK_TOLERANCE;
+            //     break;
+            // case SetupStep.RISK_TOLERANCE:
+            //     nextStep = SetupStep.TOTAL_ASSETS;
+            //     break;
+            // case SetupStep.TOTAL_ASSETS:
+            //     nextStep = SetupStep.CRYPTO_ASSETS;
+            //     break;
+            // case SetupStep.CRYPTO_ASSETS:
+            //     nextStep = SetupStep.COMPLETE;
+            //     break;
             default:
                 nextStep = SetupStep.COMPLETE;
         }
@@ -196,76 +197,76 @@ export const proceedToNextStep = async (
             break;
         }
 
-        case SetupStep.AGE: {
-            await ctx.reply("First, please tell me your age (numbers only):", {
-                parse_mode: "Markdown",
-            });
-            await kvStore.updateUserProfile(userId, {
-                waitingForInput: SetupStep.AGE,
-                currentSetupStep: SetupStep.AGE,
-            });
-            break;
-        }
+        // case SetupStep.AGE: {
+        //     await ctx.reply("First, please tell me your age (numbers only):", {
+        //         parse_mode: "Markdown",
+        //     });
+        //     await kvStore.updateUserProfile(userId, {
+        //         waitingForInput: SetupStep.AGE,
+        //         currentSetupStep: SetupStep.AGE,
+        //     });
+        //     break;
+        // }
 
-        case SetupStep.RISK_TOLERANCE: {
-            const riskKeyboard = new InlineKeyboard()
-                .text("1️⃣", "risk_1")
-                .text("2️⃣", "risk_2")
-                .text("3️⃣", "risk_3")
-                .row()
-                .text("4️⃣", "risk_4")
-                .text("5️⃣", "risk_5")
-                .text("6️⃣", "risk_6")
-                .row()
-                .text("7️⃣", "risk_7")
-                .text("8️⃣", "risk_8")
-                .text("9️⃣", "risk_9")
-                .row()
-                .text("🔟", "risk_10");
+        // case SetupStep.RISK_TOLERANCE: {
+        //     const riskKeyboard = new InlineKeyboard()
+        //         .text("1️⃣", "risk_1")
+        //         .text("2️⃣", "risk_2")
+        //         .text("3️⃣", "risk_3")
+        //         .row()
+        //         .text("4️⃣", "risk_4")
+        //         .text("5️⃣", "risk_5")
+        //         .text("6️⃣", "risk_6")
+        //         .row()
+        //         .text("7️⃣", "risk_7")
+        //         .text("8️⃣", "risk_8")
+        //         .text("9️⃣", "risk_9")
+        //         .row()
+        //         .text("🔟", "risk_10");
 
-            await ctx.reply(
-                "Next, please select your risk tolerance for crypto assets on a scale of 1-10:\n\n" +
-                    "1️⃣ = Very conservative (risk-averse)\n" +
-                    "5️⃣ = Balanced\n" +
-                    "🔟 = Aggressive (high risk tolerance)",
-                {
-                    parse_mode: "Markdown",
-                    reply_markup: riskKeyboard,
-                },
-            );
-            await kvStore.updateUserProfile(userId, {
-                currentSetupStep: SetupStep.RISK_TOLERANCE,
-            });
-            break;
-        }
+        //     await ctx.reply(
+        //         "Next, please select your risk tolerance for crypto assets on a scale of 1-10:\n\n" +
+        //             "1️⃣ = Very conservative (risk-averse)\n" +
+        //             "5️⃣ = Balanced\n" +
+        //             "🔟 = Aggressive (high risk tolerance)",
+        //         {
+        //             parse_mode: "Markdown",
+        //             reply_markup: riskKeyboard,
+        //         },
+        //     );
+        //     await kvStore.updateUserProfile(userId, {
+        //         currentSetupStep: SetupStep.RISK_TOLERANCE,
+        //     });
+        //     break;
+        // }
 
-        case SetupStep.CRYPTO_ASSETS: {
-            await ctx.reply(
-                "Enter an approximate total value of all your crypto across all wallets (numbers only, in USD):",
-                {
-                    parse_mode: "Markdown",
-                },
-            );
-            await kvStore.updateUserProfile(userId, {
-                waitingForInput: SetupStep.CRYPTO_ASSETS,
-                currentSetupStep: SetupStep.CRYPTO_ASSETS,
-            });
-            break;
-        }
+        // case SetupStep.CRYPTO_ASSETS: {
+        //     await ctx.reply(
+        //         "Enter an approximate total value of all your crypto across all wallets (numbers only, in USD):",
+        //         {
+        //             parse_mode: "Markdown",
+        //         },
+        //     );
+        //     await kvStore.updateUserProfile(userId, {
+        //         waitingForInput: SetupStep.CRYPTO_ASSETS,
+        //         currentSetupStep: SetupStep.CRYPTO_ASSETS,
+        //     });
+        //     break;
+        // }
 
-        case SetupStep.TOTAL_ASSETS: {
-            await ctx.reply(
-                "Enter an approximate total value of all your assets, including stocks, real estate, etc (numbers only, in USD):",
-                {
-                    parse_mode: "Markdown",
-                },
-            );
-            await kvStore.updateUserProfile(userId, {
-                waitingForInput: SetupStep.TOTAL_ASSETS,
-                currentSetupStep: SetupStep.TOTAL_ASSETS,
-            });
-            break;
-        }
+        // case SetupStep.TOTAL_ASSETS: {
+        //     await ctx.reply(
+        //         "Enter an approximate total value of all your assets, including stocks, real estate, etc (numbers only, in USD):",
+        //         {
+        //             parse_mode: "Markdown",
+        //         },
+        //     );
+        //     await kvStore.updateUserProfile(userId, {
+        //         waitingForInput: SetupStep.TOTAL_ASSETS,
+        //         currentSetupStep: SetupStep.TOTAL_ASSETS,
+        //     });
+        //     break;
+        // }
 
         case SetupStep.COMPLETE: {
             const profile = await kvStore.getUserProfile(userId);

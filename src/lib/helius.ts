@@ -7,13 +7,12 @@ if (!process.env.HELIUS_API_KEY) {
     throw new Error("HELIUS_API_KEY is not set");
 }
 
-const helius = new Helius(process.env.HELIUS_API_KEY);
+export const helius = new Helius(process.env.HELIUS_API_KEY);
 
 export const getAssetsByOwner = async (ownerAddress: string): Promise<DAS.GetAssetResponse[]> => {
     const response = await helius.rpc.getAssetsByOwner({
         ownerAddress,
         page: 1,
-        limit: 100,
         displayOptions: {
             showFungible: true,
         },

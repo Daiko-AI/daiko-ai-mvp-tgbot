@@ -68,80 +68,80 @@ export const setupHandler = (bot: Bot, env: Env) => {
                         await proceedToNextStep(ctx, env, userId, SetupStep.WALLET_ADDRESS);
                         break;
                     }
-                    case SetupStep.AGE: {
-                        const age = Number.parseInt(text);
-                        if (Number.isNaN(age) || age <= 0 || age >= 120) {
-                            await ctx.reply("Please enter a valid age (numbers only).", {
-                                parse_mode: "Markdown",
-                            });
-                            return;
-                        }
+                    // case SetupStep.AGE: {
+                    //     const age = Number.parseInt(text);
+                    //     if (Number.isNaN(age) || age <= 0 || age >= 120) {
+                    //         await ctx.reply("Please enter a valid age (numbers only).", {
+                    //             parse_mode: "Markdown",
+                    //         });
+                    //         return;
+                    //     }
 
-                        await kvStore.updateUserProfile(userId, {
-                            age,
-                            waitingForInput: null,
-                        });
+                    //     await kvStore.updateUserProfile(userId, {
+                    //         age,
+                    //         waitingForInput: null,
+                    //     });
 
-                        await ctx.reply(`Age set to ${age} years!`, {
-                            parse_mode: "Markdown",
-                        });
+                    //     await ctx.reply(`Age set to ${age} years!`, {
+                    //         parse_mode: "Markdown",
+                    //     });
 
-                        // Proceed to the next step
-                        await proceedToNextStep(ctx, env, userId, SetupStep.AGE);
-                        break;
-                    }
+                    //     // Proceed to the next step
+                    //     await proceedToNextStep(ctx, env, userId, SetupStep.AGE);
+                    //     break;
+                    // }
 
-                    case SetupStep.TOTAL_ASSETS: {
-                        const totalAssets = Number.parseInt(text.replace(/[,\s]/g, ""));
-                        if (Number.isNaN(totalAssets) || totalAssets < 0) {
-                            await ctx.reply("Please enter a valid amount (numbers only).", {
-                                parse_mode: "Markdown",
-                            });
-                            return;
-                        }
+                    // case SetupStep.TOTAL_ASSETS: {
+                    //     const totalAssets = Number.parseInt(text.replace(/[,\s]/g, ""));
+                    //     if (Number.isNaN(totalAssets) || totalAssets < 0) {
+                    //         await ctx.reply("Please enter a valid amount (numbers only).", {
+                    //             parse_mode: "Markdown",
+                    //         });
+                    //         return;
+                    //     }
 
-                        await kvStore.updateUserProfile(userId, {
-                            totalAssets,
-                            waitingForInput: null,
-                        });
+                    //     await kvStore.updateUserProfile(userId, {
+                    //         totalAssets,
+                    //         waitingForInput: null,
+                    //     });
 
-                        await ctx.reply(
-                            `Total assets set to ${totalAssets.toLocaleString()} USD!`,
-                            {
-                                parse_mode: "Markdown",
-                            },
-                        );
+                    //     await ctx.reply(
+                    //         `Total assets set to ${totalAssets.toLocaleString()} USD!`,
+                    //         {
+                    //             parse_mode: "Markdown",
+                    //         },
+                    //     );
 
-                        // Proceed to the next step
-                        await proceedToNextStep(ctx, env, userId, SetupStep.TOTAL_ASSETS);
-                        break;
-                    }
+                    //     // Proceed to the next step
+                    //     await proceedToNextStep(ctx, env, userId, SetupStep.TOTAL_ASSETS);
+                    //     break;
+                    // }
 
-                    case SetupStep.CRYPTO_ASSETS: {
-                        const cryptoAssets = Number.parseInt(text.replace(/[,\s]/g, ""));
-                        if (Number.isNaN(cryptoAssets) || cryptoAssets < 0) {
-                            await ctx.reply("Please enter a valid amount (numbers only).", {
-                                parse_mode: "Markdown",
-                            });
-                            return;
-                        }
+                    // case SetupStep.CRYPTO_ASSETS: {
+                    //     const cryptoAssets = Number.parseInt(text.replace(/[,\s]/g, ""));
+                    //     if (Number.isNaN(cryptoAssets) || cryptoAssets < 0) {
+                    //         await ctx.reply("Please enter a valid amount (numbers only).", {
+                    //             parse_mode: "Markdown",
+                    //         });
+                    //         return;
+                    //     }
 
-                        await kvStore.updateUserProfile(userId, {
-                            cryptoAssets,
-                            waitingForInput: null,
-                        });
+                    //     await kvStore.updateUserProfile(userId, {
+                    //         cryptoAssets,
+                    //         waitingForInput: null,
+                    //     });
 
-                        await ctx.reply(
-                            `Crypto assets set to ${cryptoAssets.toLocaleString()} USD!`,
-                            {
-                                parse_mode: "Markdown",
-                            },
-                        );
+                    //     await ctx.reply(
+                    //         `Crypto assets set to ${cryptoAssets.toLocaleString()} USD!`,
+                    //         {
+                    //             parse_mode: "Markdown",
+                    //         },
+                    //     );
 
-                        // Proceed to the next step
-                        await proceedToNextStep(ctx, env, userId, SetupStep.CRYPTO_ASSETS);
-                        break;
-                    }
+                    //     // Proceed to the next step
+                    //     await proceedToNextStep(ctx, env, userId, SetupStep.CRYPTO_ASSETS);
+                    //     break;
+                    // }
                 }
                 return;
             }
