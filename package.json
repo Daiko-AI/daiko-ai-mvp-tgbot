@@ -17,11 +17,9 @@
         "@langchain/langgraph": "^0.2.72",
         "@langchain/openai": "^0.5.10",
         "@langchain/tavily": "^0.1.1",
-        "@solana/web3.js": "^1.98.2",
         "grammy": "^1.36.1",
         "helius-sdk": "^1.5.1",
         "langchain": "^0.3.24",
-        "solana-agent-kit": "^1.4.9",
         "twitter-api-sdk": "^1.2.1",
         "zod": "^3.24.4"
     },
