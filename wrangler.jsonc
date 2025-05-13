@@ -4,7 +4,7 @@
  */
 {
     "$schema": "node_modules/wrangler/config-schema.json",
-    "name": "daiko-ai-mvp",
+    "name": "daiko-ai-mvp-tgbot",
     "main": "src/worker.ts",
     "compatibility_flags": ["nodejs_compat"],
     "compatibility_date": "2025-03-03",
