@@ -16,6 +16,6 @@ export const dataFetchNode = async (state: typeof graphState.State) => {
 
     return {
         ...state,
-        assets,
+        userAssets: assets,
     };
 };
