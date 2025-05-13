@@ -2,12 +2,18 @@ import { Annotation, MemorySaver } from "@langchain/langgraph";
 import type { BaseMessage } from "@langchain/core/messages";
 import { messagesStateReducer } from "@langchain/langgraph";
 import type { UserProfile } from "../types/db";
+import type { DAS } from "helius-sdk";
 
 export const memory = new MemorySaver();
 
-export const solanaAgentState = Annotation.Root({
+export const graphState = Annotation.Root({
     messages: Annotation<BaseMessage[]>({
         reducer: messagesStateReducer,
+        default: () => [],
+    }),
+
+    userAssets: Annotation<DAS.GetAssetResponse[]>({
+        reducer: (oldValue, newValue) => newValue ?? oldValue,
         default: () => [],
     }),
 
@@ -16,7 +22,7 @@ export const solanaAgentState = Annotation.Root({
         default: () => null,
     }),
 
-    isDataFetchOperatorNodeQuery: Annotation<boolean>({
+    isDataFetchNodeQuery: Annotation<boolean>({
         reducer: (oldValue, newValue) => newValue ?? oldValue,
         default: () => false,
     }),

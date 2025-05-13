@@ -1,16 +1,11 @@
+# openai setting
 OPENAI_API_KEY=
-RPC_URL=https://api.mainnet-beta.solana.com
-SOLANA_PRIVATE_KEY=
-TELEGRAM_BOT_TOKEN=
-PERPLEXITY_API_KEY=
-JUPITER_REFERRAL_ACCOUNT=
-JUPITER_FEE_BPS=
-FLASH_PRIVILEGE= # referral | nft | none
-FLEXLEND_API_KEY=
+
+# solana setting
 HELIUS_API_KEY=
-ETHEREUM_PRIVATE_KEY=
-ALLORA_API_KEY=
-ALLORA_API_URL=https://api.allora.network/v2
-ALLORA_NETWORK=mainnet
-ELFA_AI_API_KEY=
+
+# tavily setting
 TAVILY_API_KEY=
+
+# telegram setting
+TELEGRAM_BOT_TOKEN=

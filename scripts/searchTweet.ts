@@ -1,9 +1,4 @@
 import Client from "twitter-api-sdk";
-import dotenv from "dotenv";
-import { resolve } from "node:path";
-
-// Load environment variables
-dotenv.config({ path: resolve(__dirname, "../.dev.vars") });
 
 const main = async () => {
     if (!process.env.TWITTER_API_BEARER_TOKEN) {

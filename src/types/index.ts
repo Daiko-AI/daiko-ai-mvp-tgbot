@@ -55,7 +55,7 @@ export interface LogWriter {
 
 /** Configuration options for logging */
 export interface LoggerConfig {
-    level: LogLevel;
+    level?: LogLevel;
     enableTimestamp?: boolean;
     enableColors?: boolean;
     logToFile?: boolean;

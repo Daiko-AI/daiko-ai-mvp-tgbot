@@ -1,8 +1,9 @@
 import { createReactAgent } from "@langchain/langgraph/prebuilt";
 import { gpt4oMini } from "../utils/model";
-import { memory, type solanaAgentState } from "../utils/state";
+import { memory, type graphState } from "../utils/state";
 import { TwitterSearch } from "../tools/twitterSearch";
 import { twitterPrompt } from "../prompts/twitter";
+import { logger } from "../utils/logger";
 
 const twitterAgent = createReactAgent({
     llm: gpt4oMini,
@@ -11,12 +12,12 @@ const twitterAgent = createReactAgent({
     prompt: twitterPrompt,
 });
 
-export const twitterNode = async (state: typeof solanaAgentState.State) => {
-    console.log("twitterNode");
+export const twitterNode = async (state: typeof graphState.State) => {
+    logger.info("twitterNode", "twitterNode", state);
     const { messages } = state;
 
     const result = await twitterAgent.invoke({ messages });
-    console.log("twitter result", result);
+    logger.info("twitterNode", "twitter result", result);
 
     return { messages: [...result.messages] };
 };

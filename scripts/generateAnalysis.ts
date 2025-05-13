@@ -1,9 +1,4 @@
-import { config } from "dotenv";
-import { resolve } from "node:path";
 import { HumanMessage } from "@langchain/core/messages";
-
-// Load environment variables
-config({ path: resolve(__dirname, "../.dev.vars") });
 
 const main = async () => {
     const { initGraph } = await import("../src/agents");

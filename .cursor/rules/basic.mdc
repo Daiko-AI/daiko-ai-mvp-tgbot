@@ -1,0 +1,90 @@
+---
+description:
+globs:
+alwaysApply: true
+---
+# Basic Rules
+
+- **絶対に**コードを書き始める前に、実装方針をこちらに伝えてOKをもらってから実装を始めて下さい
+- `npm`ではなく**必ず**`bun`を使って下さい！！
+- `node`はv22以降defaultでtsファイルを実行できます、`package.json`でtsファイルを実行する場合は`node --experimental-strip-types --experimental-transform-types --experimental-detect-module --no-warnings=ExperimentalWarning`で実行して下さい
+- `Turborepo`, `bun`を用いた monorepo 構成を効果的に使用し、package の切り分けや、型の共通化などを考えながらコードを書いて下さい
+- build errorの解決などは勝手に`tsup`などの依存をいれるのではなく根本原因を考え、`bun run build`が通るようにして下さい、
+- errorを直す時はどういう意図・仮説でどういう処理を施すのかをちゃんと考えながら対処して下さい。
+- `packages/` 以下には `apps/` 以下の application やその他のインフラやツールでも portable に使えるような core 機能の package を提供し保守性の高いコード、アーキテクチャを保って下さい。
+- 注意点として、ディレクトリ構造には気をつけて下さい。プロジェクト全体で使うようなものは`packages/shared/`以下に、package固有の概念が関わるものは `packages/package-name/`以下にコードを書いて、適切にスコープと責務を考えてコードの粒度や場所を考えて下さい。
+
+## Practices
+
+- 小さく始めて段階的に拡張
+- 過度な抽象化を避ける
+- コードよりも型を重視
+- 複雑さに応じてアプローチを調整
+
+## Code Style
+
+- 関数優先（クラスは必要な場合のみ）
+- 不変更新パターンの活用
+- 早期リターンで条件分岐をフラット化
+- エラーとユースケースの列挙型定義
+
+## Adapter Pattern
+
+- 外部依存を抽象化
+- インターフェースは呼び出し側で定義
+- テスト時は容易に差し替え可能
+
+## 実装手順
+
+1. **型設計**
+
+   - まず型を定義
+   - ドメインの言語を型で表現
+
+2. **純粋関数から実装**
+
+   - 外部依存のない関数を先に
+   - テストを先に書く
+
+3. **副作用を分離**
+
+   - IO 操作は関数の境界に押し出す
+   - 副作用を持つ処理を Promise でラップ
+
+4. **アダプター実装**
+   - 外部サービスや DB へのアクセスを抽象化
+   - テスト用モックを用意
+
+## ディレクトリ構造
+
+```zsh
+.
+├── README.md
+├── package.json
+├── turbo.json
+├── apps
+│   ├── news-scraper-job      # ニュースサイトスクレイパージョブ
+│   ├── web                  # メインのウェブアプリケーション (Next.js)
+│   │   ├── src
+│   │   ├── public
+│   │   └── package.json
+│   └── x-scraper-job        # Xスクレイパージョブ
+├── docs                     # ドキュメント
+│   ├── db                   # データベースドキュメント
+│   │   ├── schema.dbml      # データベーススキーマ
+│   │   └── erd.svg          # データベースER図
+│   └── graph.png            # エージェントアーキテクチャ図
+│   └── specs                # 要件定義などを格納
+├── packages
+│   ├── shared               # 共有コード、型定義、ユーティリティ
+│   │   ├── src
+│   │   └── package.json
+│   ├── news-scraper         # ニュースサイトスクレイパー
+│   │   ├── src
+│   │   └── package.json
+│   └── x-scraper            # X (Twitter) スクレイパー
+│       ├── src
+│       └── package.json
+└── scripts
+    └── clean-packages.sh    # ビルドファイルのクリーンアップ
+```

@@ -1,9 +1,9 @@
 import type { Bot, Context } from "grammy";
-import { initGraph } from "../../agents";
+import { initGraph } from "../../agent";
 import { HumanMessage, AIMessage } from "@langchain/core/messages";
 import { TIMEOUT_MS } from "../../constants";
 import { LogLevel, type StreamChunk } from "../../types";
-import { Logger } from "../../utils/logger";
+import { logger } from "../../utils/logger";
 import { KVStore } from "../kv";
 import { SetupStep } from "../../types";
 import { proceedToNextStep } from "./command";
@@ -24,12 +24,6 @@ export const setupHandler = (bot: Bot, env: Env) => {
         if (!userId || !ctx.message?.text || !kvStore) {
             return;
         }
-
-        const logger = new Logger({
-            level: LogLevel.INFO,
-            enableTimestamp: true,
-            enableColors: true,
-        });
 
         try {
             // We've already checked that kvStore is not null above, but the linter still warns

@@ -3,7 +3,9 @@
     "biome.enabled": true,
     "editor.formatOnSave": true,
     "files.associations": {
-        ".cursorrules": "markdown"
+        ".cursorrules": "markdown",
+        ".dev.vars": "dotenv",
+        ".dev.vars.example": "dotenv"
     },
     "[typescript]": {
         "editor.defaultFormatter": "biomejs.biome"
