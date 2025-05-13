@@ -271,21 +271,21 @@ export const proceedToNextStep = async (
         case SetupStep.COMPLETE: {
             const profile = await kvStore.getUserProfile(userId);
 
-            let profileSummary =
-                "*Profile Setup Complete*\n\nHere is your profile information:\n\n";
+            // let profileSummary =
+            //     "*Profile Setup Complete*\n\nHere is your profile information:\n\n";
 
-            if (profile) {
-                if (profile.age) profileSummary += `🔢 Age: ${profile.age} years\n`;
-                if (profile.cryptoRiskTolerance)
-                    profileSummary += `📊 Risk Tolerance: ${profile.cryptoRiskTolerance}/10\n`;
-                if (profile.totalAssets)
-                    profileSummary += `💰 Total Assets: ${profile.totalAssets.toLocaleString()} USD\n`;
-                if (profile.cryptoAssets)
-                    profileSummary += `🪙 Crypto Assets: ${profile.cryptoAssets.toLocaleString()} USD\n`;
-            }
+            // if (profile) {
+            //     if (profile.age) profileSummary += `🔢 Age: ${profile.age} years\n`;
+            //     if (profile.cryptoRiskTolerance)
+            //         profileSummary += `📊 Risk Tolerance: ${profile.cryptoRiskTolerance}/10\n`;
+            //     if (profile.totalAssets)
+            //         profileSummary += `💰 Total Assets: ${profile.totalAssets.toLocaleString()} USD\n`;
+            //     if (profile.cryptoAssets)
+            //         profileSummary += `🪙 Crypto Assets: ${profile.cryptoAssets.toLocaleString()} USD\n`;
+            // }
 
-            profileSummary +=
-                "\nSetup is complete! I’ll keep an eye on your tokens and alert you with the reason when danger’s near.";
+            const profileSummary =
+                "*Setup is complete!* \n I’ll keep an eye on your tokens and alert you with the reason when danger’s near.";
 
             await ctx.reply(profileSummary, {
                 parse_mode: "Markdown",
