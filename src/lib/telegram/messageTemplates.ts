@@ -17,9 +17,8 @@ Daiko AI is an advanced AI assistant that supports your daily life.
 • 📅 Schedule management support
 
 🔗 *Social Links*:
-• [Official Website](https://daiko-ai.example.com)
-• [Twitter](https://twitter.com/daikoai)
-• [Discord](https://discord.gg/daikoai)
+• [Official Website](https://daiko.ai)
+• [Twitter](https://x.com/DaikoAI)
 
 ℹ️ *About Privacy*:
 Daiko AI collects your conversation content and basic usage data to provide better service. This information is used only for AI improvement and personalized support.
