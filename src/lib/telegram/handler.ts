@@ -8,6 +8,12 @@ import { KVStore } from "../kv";
 import { SetupStep } from "../../types";
 import { proceedToNextStep } from "./command";
 import { validateSolanaAddress } from "../../utils/solana";
+import { dumpTokenUsage, isAnalyzerMessage, isGeneralistMessage } from "../../utils";
+
+// timeout processing
+const timeoutPromise = new Promise((_, reject) =>
+    setTimeout(() => reject(new Error("Timeout")), TIMEOUT_MS),
+);
 
 // NOTE: Map for storing chat history which is global memory on cloudflare
 const chatHistory = new Map();
@@ -145,7 +151,7 @@ export const setupHandler = (bot: Bot, env: Env) => {
 
             // initialize graph
             const { agent, config } = await initGraph(userId);
-            logger.info("message handler", "Initialized Graph");
+            logger.debug("message handler", "Initialized Graph");
 
             if (!chatHistory.has(userId)) {
                 chatHistory.set(userId, []);
@@ -159,17 +165,12 @@ export const setupHandler = (bot: Bot, env: Env) => {
             // send user message to agent
             const stream = await agent.stream(
                 {
-                    messages: [new HumanMessage(ctx.message.text)],
+                    messages: [new HumanMessage(ctx.message.text), ...userChatHistory],
                     userProfile: profile,
                 },
                 config,
             );
             logger.info("message handler", "Stream created");
-
-            // timeout processing
-            const timeoutPromise = new Promise((_, reject) =>
-                setTimeout(() => reject(new Error("Timeout")), TIMEOUT_MS),
-            );
 
             // process response from stream
             try {
@@ -177,26 +178,24 @@ export const setupHandler = (bot: Bot, env: Env) => {
                     stream,
                     timeoutPromise,
                 ])) as AsyncIterable<StreamChunk>) {
-                    // logger.info("message handler", "Received chunk", chunk);
-
-                    // チャンクからanalyzerまたはgeneralistのメッセージを取得
-                    if ("analyzer" in chunk && chunk.analyzer?.messages?.length > 0) {
+                    // Get analyzer or generalist message from chunk
+                    if (isAnalyzerMessage(chunk)) {
                         const lastIndex = chunk.analyzer.messages.length - 1;
                         if (chunk.analyzer.messages[lastIndex]?.content) {
                             latestAgentMessage = String(chunk.analyzer.messages[lastIndex].content);
-                            logger.info(
+                            logger.debug(
                                 "message handler",
                                 "Got analyzer message",
                                 latestAgentMessage,
                             );
                         }
-                    } else if ("generalist" in chunk && chunk.generalist?.messages?.length > 0) {
+                    } else if (isGeneralistMessage(chunk)) {
                         const lastIndex = chunk.generalist.messages.length - 1;
                         if (chunk.generalist.messages[lastIndex]?.content) {
                             latestAgentMessage = String(
                                 chunk.generalist.messages[lastIndex].content,
                             );
-                            logger.info(
+                            logger.debug(
                                 "message handler",
                                 "Got generalist message",
                                 latestAgentMessage,
@@ -204,31 +203,7 @@ export const setupHandler = (bot: Bot, env: Env) => {
                         }
                     }
 
-                    // Dump token usage
-                    if (
-                        "analyzer" in chunk &&
-                        chunk.analyzer?.messages?.length > 0 &&
-                        chunk.analyzer.messages[chunk.analyzer.messages.length - 1]?.usage_metadata
-                    ) {
-                        logger.info(
-                            "message handler",
-                            "Usage metadata (analyzer)",
-                            chunk.analyzer.messages[chunk.analyzer.messages.length - 1]
-                                .usage_metadata,
-                        );
-                    } else if (
-                        "generalist" in chunk &&
-                        chunk.generalist?.messages?.length > 0 &&
-                        chunk.generalist.messages[chunk.generalist.messages.length - 1]
-                            ?.usage_metadata
-                    ) {
-                        logger.info(
-                            "message handler",
-                            "Usage metadata (generalist)",
-                            chunk.generalist.messages[chunk.generalist.messages.length - 1]
-                                .usage_metadata,
-                        );
-                    }
+                    dumpTokenUsage(chunk);
 
                     // latestAgentMessageが取得できた場合の処理
                     if (latestAgentMessage) {
