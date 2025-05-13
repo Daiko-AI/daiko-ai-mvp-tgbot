@@ -30,11 +30,11 @@ For more details, check [here](https://help.zoho.com/portal/en/kb/desk/support-c
 1. Clone the repository
 
    ```bash
-   git clone https://github.com/yourusername/sendai-cf-tgbot-sample.git
+   git clone https://github.com/DaikoAI/daiko-ai-mvp-tgbot.git
    ```
 
    ```bash
-   cd sendai-cf-tgbot-sample
+   cd daiko-ai-mvp-tgbot
    ```
 
 2. Install dependencies

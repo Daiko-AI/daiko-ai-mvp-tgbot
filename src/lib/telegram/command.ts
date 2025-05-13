@@ -4,9 +4,11 @@ import { welcomeMessage } from "./messageTemplates";
 import { KVStore } from "../kv";
 import type { UserProfile } from "../../types/db";
 import { SetupStep } from "../../types";
+import { logger } from "../../utils/logger";
 
 export const setupCommands = (bot: Bot, env: Env) => {
     if (!env.DAIKO_AI_DEV) {
+        logger.error("command", "DAIKO_AI_DEV environment variable not found.");
         throw new Error("DAIKO_AI_DEV environment variable not found.");
     }
 
@@ -282,7 +284,7 @@ export const proceedToNextStep = async (
             }
 
             profileSummary +=
-                "\nSetup is complete! Daiko AI will provide you with optimal support. If you need any assistance, feel free to send a message!";
+                "\nSetup is complete! I’ll keep an eye on your tokens and alert you with the reason when danger’s near.";
 
             await ctx.reply(profileSummary, {
                 parse_mode: "Markdown",

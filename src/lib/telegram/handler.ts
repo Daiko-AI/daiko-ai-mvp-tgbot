@@ -2,11 +2,12 @@ import type { Bot, Context } from "grammy";
 import { initGraph } from "../../agent";
 import { HumanMessage, AIMessage } from "@langchain/core/messages";
 import { TIMEOUT_MS } from "../../constants";
-import { LogLevel, type StreamChunk } from "../../types";
+import type { StreamChunk } from "../../types";
 import { logger } from "../../utils/logger";
 import { KVStore } from "../kv";
 import { SetupStep } from "../../types";
 import { proceedToNextStep } from "./command";
+import { validateSolanaAddress } from "../../utils/solana";
 
 // NOTE: Map for storing chat history which is global memory on cloudflare
 const chatHistory = new Map();
@@ -14,6 +15,7 @@ const chatHistory = new Map();
 export const setupHandler = (bot: Bot, env: Env) => {
     // Get KVStore instance
     if (!env.DAIKO_AI_DEV) {
+        logger.error("message handler", "DAIKO_AI_DEV environment variable not found.");
         throw new Error("DAIKO_AI_DEV environment variable not found.");
     }
 
@@ -22,6 +24,7 @@ export const setupHandler = (bot: Bot, env: Env) => {
     bot.on("message:text", async (ctx: Context) => {
         const userId = ctx.from?.id.toString();
         if (!userId || !ctx.message?.text || !kvStore) {
+            logger.warn("message handler", "User ID or message text is null");
             return;
         }
 
@@ -38,6 +41,27 @@ export const setupHandler = (bot: Bot, env: Env) => {
 
                 // Process input values for setup
                 switch (waitingFor) {
+                    case SetupStep.WALLET_ADDRESS: {
+                        if (!validateSolanaAddress(text)) {
+                            await ctx.reply("Please enter a valid wallet address.", {
+                                parse_mode: "Markdown",
+                            });
+                            return;
+                        }
+
+                        await kvStore.updateUserProfile(userId, {
+                            walletAddress: text,
+                            waitingForInput: null,
+                        });
+
+                        await ctx.reply(`Wallet address set to ${text}!`, {
+                            parse_mode: "Markdown",
+                        });
+
+                        // Proceed to the next step
+                        await proceedToNextStep(ctx, env, userId, SetupStep.WALLET_ADDRESS);
+                        break;
+                    }
                     case SetupStep.AGE: {
                         const age = Number.parseInt(text);
                         if (Number.isNaN(age) || age <= 0 || age >= 120) {
