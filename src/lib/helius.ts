@@ -11,6 +11,10 @@ export const getAssetsByOwner = async (ownerAddress: string): Promise<DAS.GetAss
     const response = await helius.rpc.getAssetsByOwner({
         ownerAddress,
         page: 1,
+        limit: 100,
+        displayOptions: {
+            showFungible: true,
+        },
     });
 
     return response.items;

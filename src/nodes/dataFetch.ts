@@ -6,11 +6,13 @@ import type { graphState } from "../utils/state";
 export const dataFetchNode = async (state: typeof graphState.State) => {
     logger.info("dataFetchNode", "dataFetchNode", state);
 
-    if (!state.userProfile) {
-        throw new Error("User profile not found");
+    if (!state.userProfile?.walletAddress) {
+        logger.error("dataFetchNode", "User wallet address not found");
+        throw new Error("User wallet address not found");
     }
 
     const assets = await getAssetsByOwner(state.userProfile.walletAddress);
+    logger.info("dataFetchNode", "assets", assets);
 
     return {
         ...state,
