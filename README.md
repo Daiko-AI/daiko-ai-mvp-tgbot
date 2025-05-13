@@ -9,7 +9,7 @@ This project demonstrates how to build a Telegram bot using [Solana Agent Kit](h
 ## 📌 Requirements
 
 - [Node.js](https://nodejs.org/) (v18 or higher)
-- [pnpm](https://pnpm.io/) package manager
+- [bun](https://bun.sh/) package manager
 - [Cloudflare](https://www.cloudflare.com/) account
 - [Telegram](https://telegram.org/) account and bot token
 - [OpenAI API key](https://platform.openai.com/api-keys)
@@ -40,7 +40,7 @@ For more details, check [here](https://help.zoho.com/portal/en/kb/desk/support-c
 2. Install dependencies
 
    ```bash
-   pnpm install
+   bun install
    ```
 
 3. Set up environment variables
@@ -51,7 +51,7 @@ For more details, check [here](https://help.zoho.com/portal/en/kb/desk/support-c
 4. Start the local development server
 
    ```bash
-   pnpm run dev
+   bun run dev
    ```
 
 5. In a separate terminal, expose your local server using ngrok
@@ -92,7 +92,7 @@ npx wrangler kv namespace create DAIKO_AI_DEV
 3. Deploy your project
 
    ```bash
-   pnpm run deploy
+   bun run deploy
    ```
 
 4. Set up the webhook using your deployed URL
@@ -111,9 +111,9 @@ This project uses [Biome](https://biomejs.dev/) for linting and formatting. Biom
 
 Available scripts:
 
-- `pnpm lint`: Run Biome linter on source files
-- `pnpm format`: Format source files with Biome
-- `pnpm check`: Check and automatically fix issues in source files
+- `bun lint`: Run Biome linter on source files
+- `bun format`: Format source files with Biome
+- `bun check`: Check and automatically fix issues in source files
 
 VS Code users can install the [Biome extension](https://marketplace.visualstudio.com/items?itemName=biomejs.biome) for in-editor linting and formatting.
 

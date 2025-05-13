@@ -6,20 +6,20 @@ export class Logger {
     private config: Omit<Required<LoggerConfig>, "logWriter">;
     private logWriter?: LogWriter;
 
-    constructor(config: LoggerConfig) {
+    constructor(config?: LoggerConfig) {
         this.config = {
-            level: config.level,
-            enableTimestamp: config.enableTimestamp ?? true,
-            enableColors: config.enableColors ?? true,
-            logToFile: config.logToFile ?? false,
-            logPath: config.logPath ?? "./logs",
+            level: config?.level ?? LogLevel.INFO,
+            enableTimestamp: config?.enableTimestamp ?? true,
+            enableColors: config?.enableColors ?? true,
+            logToFile: config?.logToFile ?? false,
+            logPath: config?.logPath ?? "./logs",
         };
 
-        if (this.config.logToFile && !config.logWriter) {
+        if (this.config.logToFile && !config?.logWriter) {
             throw new Error("LogWriter must be provided when logToFile is enabled");
         }
 
-        if (config.logWriter) {
+        if (config?.logWriter) {
             this.logWriter = config.logWriter;
         }
     }
@@ -122,3 +122,7 @@ export class Logger {
         this.logWriter.write(logLine);
     }
 }
+
+export const logger = new Logger({
+    level: process.env.NODE_ENV === "development" ? LogLevel.DEBUG : LogLevel.INFO,
+});

@@ -34,9 +34,8 @@ export const setupCommands = (bot: Bot, env: Env) => {
             return;
         }
 
-        const userId = ctx.from.id.toString();
-
         // Get existing profile or create a new one
+        const userId = ctx.from.id.toString();
         let userProfile = await kvStore?.getUserProfile(userId);
 
         if (!userProfile) {
