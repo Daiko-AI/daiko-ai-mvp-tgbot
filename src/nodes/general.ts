@@ -20,7 +20,9 @@ const generalAgent = createReactAgent({
     prompt: generalPrompt,
 });
 
-export const generalistNode = async (state: typeof graphState.State) => {
+export const generalistNode = async (
+    state: typeof graphState.State,
+): Promise<Partial<typeof graphState.State>> => {
     const { messages } = state;
 
     const result = await generalAgent.invoke({ messages });

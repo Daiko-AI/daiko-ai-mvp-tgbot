@@ -5,7 +5,9 @@ import { prompt, parser } from "../prompts/manager";
 
 const chain = RunnableSequence.from([prompt, gpt4o, parser]);
 
-export const managerNode = async (state: typeof graphState.State) => {
+export const managerNode = async (
+    state: typeof graphState.State,
+): Promise<Partial<typeof graphState.State>> => {
     const { messages } = state;
 
     const result = await chain.invoke({

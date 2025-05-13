@@ -16,7 +16,9 @@ export const analyzerAgent = createReactAgent({
     stateSchema: graphState,
 });
 
-export const analyzerNode = async (state: typeof graphState.State) => {
+export const analyzerNode = async (
+    state: typeof graphState.State,
+): Promise<Partial<typeof graphState.State>> => {
     logger.info("analyzerNode", "analyzerNode", state);
     const { messages, userAssets, userProfile } = state;
 

@@ -12,7 +12,9 @@ const twitterAgent = createReactAgent({
     prompt: twitterPrompt,
 });
 
-export const twitterNode = async (state: typeof graphState.State) => {
+export const twitterNode = async (
+    state: typeof graphState.State,
+): Promise<Partial<typeof graphState.State>> => {
     logger.info("twitterNode", "twitterNode", state);
     const { messages } = state;
 
