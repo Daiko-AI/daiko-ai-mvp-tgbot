@@ -126,7 +126,7 @@ export const setupCommands = (bot: Bot, env: Env) => {
 
     bot.command("help", async (ctx) => {
         await ctx.reply(
-            "Please use /setup to start the setup process. If you need help, please contact @daiko_ai.",
+            "Please use /setup to start the setup process. If you need help, please contact @DaikoAI.",
             {
                 parse_mode: "Markdown",
             },
@@ -135,7 +135,7 @@ export const setupCommands = (bot: Bot, env: Env) => {
 
     bot.command("feedback", async (ctx) => {
         await ctx.reply(
-            "please fill out the feedback form at https://forms.gle/daiko-ai-feedback",
+            "If you have feedback or issues, please open an issue here: https://github.com/Daiko-AI/daiko-ai-mvp-tgbot/issues",
             {
                 parse_mode: "Markdown",
             },

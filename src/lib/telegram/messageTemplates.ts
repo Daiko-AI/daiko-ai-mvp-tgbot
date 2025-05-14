@@ -10,11 +10,11 @@ export const welcomeMessage = `
 
 Daiko AI is an advanced AI assistant that supports your daily life.
 
-📱 *Main Features*:
-• 💬 Natural conversation support
-• 📊 Personalized recommendations
-• 🔍 Information search and summarization
-• 📅 Schedule management support
+�� *Main Features*:
+• 🔗 Track your Solana portfolio by simply entering your wallet address
+• 📈 Get real-time signals and alerts for your assets
+• 📰 Receive concise summaries and insights about your portfolio
+• 🚀 Stay updated with important market movements relevant to your holdings
 
 🔗 *Social Links*:
 • [Official Website](https://daiko.ai)
